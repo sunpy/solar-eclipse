@@ -95,7 +95,7 @@ package_info = get_package_info()
 
 # Add the project-global data
 package_info['package_data'].setdefault(PACKAGENAME, [])
-package_info['package_data'][PACKAGENAME].append('sample-photos/*')
+package_info['package_data'][PACKAGENAME].append('sample-photos/*.*')
 
 # Define entry points for command-line scripts
 entry_points = {'console_scripts': []}
@@ -121,7 +121,8 @@ package_info['package_data'][PACKAGENAME].extend(c_files)
 # Note that requires and provides should not be included in the call to
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
-
+print('got here')
+print(scripts)
 setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
