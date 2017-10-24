@@ -1,5 +1,4 @@
-"""Procedures to gather meta data from the photograph"""
-import exifread # to read information from the image
+"""Procedures to gather meta data from a photograph."""
 import astropy.wcs
 import numpy as np
 import scipy.ndimage as ndimage
@@ -8,6 +7,7 @@ from skimage.transform import hough_circle, hough_circle_peaks
 import astropy.wcs
 from astropy.coordinates import EarthLocation, SkyCoord
 import astropy.units as u
+from datetime import datetime
 
 import sunpy
 import sunpy.map
@@ -15,10 +15,12 @@ import sunpy.coordinates
 
 import exifread # to read information from the image
 
+__all__ = ['get_exif_location', 'get_meta_from_exif']
 
 def _convert_to_degress(value):
     """
-    Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
+    Helper function to convert the GPS coordinates stored in the EXIF to
+    degress in float format
     :param value:
     :type value: exifread.utils.Ratio
     :rtype: float
@@ -58,22 +60,22 @@ def get_exif_location(exif_data):
 def get_meta_from_exif(exif_data):
     """Gather meta header from the EXIF data."""
 
-    if "EXIF ExposureTime" in tags:
-        exposure_tag = tags['EXIF ExposureTime']
+    if "EXIF ExposureTime" in exif_data:
+        exposure_tag = exif_data['EXIF ExposureTime']
         exposure_time = exposure_tag.values[0].num / exposure_tag.values[
             0].den * u.s
-    if "Image Artist" in tags:
-        author_str = tags['Image Artist'].values
-    if "EXIF DateTimeOriginal" in tags:
-        datetime_str = tags['EXIF DateTimeOriginal'].values.replace(' ',
+    if "Image Artist" in exif_data:
+        author_str = exif_data['Image Artist'].values
+    if "EXIF DateTimeOriginal" in exif_data:
+        datetime_str = exif_data['EXIF DateTimeOriginal'].values.replace(' ',
                                                                     ':').split(
             ':')
         time = datetime(int(datetime_str[0]), int(datetime_str[1]),
                         int(datetime_str[2]), int(datetime_str[3]),
                         int(datetime_str[4]), int(datetime_str[5]))
-    if "Image Model" in tags:
-        camera_model_str = tags['Image Model'].values
-    lat, lon = get_exif_location(tags)
+    if "Image Model" in exif_data:
+        camera_model_str = exif_data['Image Model'].values
+    lat, lon = get_exif_location(exif_data)
     if ((lat != None) and (lon != None)):
         gps = [lat, lon] * u.deg
 
