@@ -179,3 +179,31 @@ if eval(setup_cfg.get('edit_on_github')):
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
 
+try:
+    import sphinx_gallery
+    extensions += ["sphinx_gallery.gen_gallery"]
+
+    sphinx_gallery_conf = {
+        'backreferences_dir':
+        'generated{}modules'.format(os.sep),  # path to store the module using example template
+        'filename_pattern':
+        '^((?!skip_).)*$',  # execute all examples except those that start with "skip_"
+        'examples_dirs': os.path.join('..', 'examples'),  # path to the examples scripts
+        'gallery_dirs': os.path.join('generated',
+                                    'gallery'),  # path to save gallery generated examples
+        'default_thumb_file': os.path.join('.', 'logo', 'sunpy_icon_128x128.png'),
+        'reference_url': {
+            'sunpy': None,
+            'astropy': 'http://docs.astropy.org/en/stable/',
+            'matplotlib': 'http://matplotlib.org/',
+            'numpy': 'http://docs.scipy.org/doc/numpy/',
+        },
+        'abort_on_example_error': True,
+        'plot_gallery': True
+    }
+except ImportError:
+        def setup(app):
+            app.warn('The sphinx_gallery extension is not installed, so the '
+                    'gallery will not be built.  You will probably see '
+                    'additional warnings about undefined references due '
+                    'to this.')
