@@ -17,6 +17,7 @@ import exifread # to read information from the image
 
 __all__ = ['get_exif_location', 'get_meta_from_exif']
 
+
 def _convert_to_degress(value):
     """
     Helper function to convert the GPS coordinates stored in the EXIF to
@@ -57,6 +58,18 @@ def get_exif_location(exif_data):
     return lat, lon
 
 
+def get_image_time(exif_data):
+    """Get the time from the photograph."""
+    if "EXIF DateTimeOriginal" in exif_data:
+        datetime_str = exif_data['EXIF DateTimeOriginal'].values.replace(' ',
+                                                                    ':').split(
+            ':')
+        time = datetime(int(datetime_str[0]), int(datetime_str[1]),
+                        int(datetime_str[2]), int(datetime_str[3]),
+                        int(datetime_str[4]), int(datetime_str[5]))
+    return time
+
+
 def get_meta_from_exif(exif_data):
     """Gather meta header from the EXIF data."""
 
@@ -66,18 +79,14 @@ def get_meta_from_exif(exif_data):
             0].den * u.s
     if "Image Artist" in exif_data:
         author_str = exif_data['Image Artist'].values
-    if "EXIF DateTimeOriginal" in exif_data:
-        datetime_str = exif_data['EXIF DateTimeOriginal'].values.replace(' ',
-                                                                    ':').split(
-            ':')
-        time = datetime(int(datetime_str[0]), int(datetime_str[1]),
-                        int(datetime_str[2]), int(datetime_str[3]),
-                        int(datetime_str[4]), int(datetime_str[5]))
+
     if "Image Model" in exif_data:
         camera_model_str = exif_data['Image Model'].values
     lat, lon = get_exif_location(exif_data)
     if ((lat != None) and (lon != None)):
         gps = [lat, lon] * u.deg
+
+    time = get_image_time(exif_data)
 
     result = {}
     result.update({'AUTHOR': author_str})
@@ -87,31 +96,6 @@ def get_meta_from_exif(exif_data):
     result.update({'LON': gps[1]})
     result.update({'DATEOBS': time.isoformat()})
     return result
-
-
-def find_sun_center(im):
-    """Given an image which contains the Sun, find the circle of the Sun
-    and return the position as well as the radius."""
-    blur_im = ndimage.gaussian_filter(im, 8)
-    mask = blur_im > blur_im.mean() * 3
-    label_im, nb_labels = ndimage.label(mask)
-    slice_x, slice_y = ndimage.find_objects(label_im == 1)[0]
-    roi = blur_im[slice_x, slice_y]
-    sx = ndimage.sobel(roi, axis=0, mode='constant')
-    sy = ndimage.sobel(roi, axis=1, mode='constant')
-    sob = np.hypot(sx, sy)
-    hough_radii = np.arange(np.floor(np.mean(sob.shape) / 4),
-                            np.ceil(np.mean(sob.shape) / 2), 10)
-    hough_res = hough_circle(sob > (sob.mean() * 5), hough_radii)
-
-    # Select the most prominent circle
-    accums, cy, cx, radii = hough_circle_peaks(hough_res, hough_radii,
-                                               total_num_peaks=1)
-    im_cx = (cx + slice_x.start) * u.pix
-    im_cy = (cy + slice_y.start) * u.pix
-    im_radius = radii * u.pix
-
-    return im_cx, im_cy, im_radius
 
 
 def get_plate_scale(time, im_radius):
@@ -133,17 +117,19 @@ def build_wcs(im_cx, im_cy, plate_scale):
 
 
 def build_meta(wcs, exif_data):
+    time = get_image_time(exif_data)
     wcs.wcs.dateobs = time.isoformat()
-    header = dict(wcs.wcs.to_header())
+    header = dict(wcs.to_header())
 
+    header.update(get_meta_from_exif(exif_data))
     dsun = sunpy.coordinates.get_sunearth_distance(time.isoformat())
-    lat = exif_data.get('lat')
-    lon = exif_data.get('lon')
-    time = exif_data.get('DATEOBS')
+    lat = header.get('LAT')
+    lon = header.get('LON')
     solar_rotation_angle = get_solar_rotation_angle(lat, lon, time)
-    header = dict(w.to_header())
     header.update({'CROTA2': solar_rotation_angle.to('deg').value})
     header.update({'DSUN_OBS': dsun.to('m').value})
+    hgln_obs = 0 * u.deg
+    hglt_obs = sunpy.coordinates.get_sun_B0(time)
     header.update({'HGLN_OBS': hgln_obs.to('deg').value})
     header.update({'HGLT_OBS': hglt_obs.to('deg').value})
     header.update({'CTYPE1': 'HPLN-TAN'})
@@ -156,7 +142,7 @@ def build_meta(wcs, exif_data):
 
 def get_solar_rotation_angle(lat, lon, time, fudge_angle=0):
     """Get the solar rotation angle"""
-    loc = EarthLocation(lat=gps[0], lon=gps[1])
+    loc = EarthLocation(lat=lat, lon=lon)
     solar_rotation_angle = sunpy.coordinates.get_sun_orientation(loc, time)
     return solar_rotation_angle + fudge_angle
 
