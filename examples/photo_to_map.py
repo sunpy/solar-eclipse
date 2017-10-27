@@ -15,7 +15,7 @@ import numpy as np
 import sunpy.map
 
 from eclipse import SAMPLE_PHOTO
-from eclipse.process import find_center_and_radius
+from eclipse.process import find_sun_center_and_radius
 import eclipse.meta as m
 import exifread
 
@@ -25,7 +25,7 @@ im_rgb = np.flipud(matplotlib.image.imread(SAMPLE_PHOTO))
 im = np.average(im_rgb, axis=2)
 ###############################################################################
 # next fit a circle to the Sun
-im_cx, im_cy, im_radius = find_center_and_radius(im)
+im_cx, im_cy, im_radius = find_sun_center_and_radius(im)
 
 ###############################################################################
 # Next get some metadata from the photo. First grab the EXIF data

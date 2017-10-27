@@ -13,14 +13,14 @@ from matplotlib.patches import Circle
 import numpy as np
 
 from eclipse import SAMPLE_PHOTO
-from eclipse.process import find_center_and_radius
+from eclipse.process import find_sun_center_and_radius
 ###############################################################################
 # read in the image and flip it so that it's correct, also remove the color
 im_rgb = np.flipud(matplotlib.image.imread(SAMPLE_PHOTO))
 im = np.average(im_rgb, axis=2)
 ###############################################################################
 # next fit a circle to the Sun
-im_cx, im_cy, im_radius = find_center_and_radius(im)
+im_cx, im_cy, im_radius = find_sun_center_and_radius(im)
 
 ###############################################################################
 # Show the result on a plot
