@@ -1,8 +1,6 @@
 """Procedures to gather meta data from a photograph."""
 import astropy.wcs
 import numpy as np
-import scipy.ndimage as ndimage
-from skimage.transform import hough_circle, hough_circle_peaks
 
 import astropy.wcs
 from astropy.coordinates import EarthLocation, SkyCoord
@@ -12,6 +10,7 @@ from datetime import datetime
 import sunpy
 import sunpy.map
 import sunpy.coordinates
+from sunpy.util import MetaDict
 
 import exifread # to read information from the image
 
@@ -119,23 +118,23 @@ def build_wcs(im_cx, im_cy, plate_scale):
 def build_meta(wcs, exif_data):
     time = get_image_time(exif_data)
     wcs.wcs.dateobs = time.isoformat()
-    header = dict(wcs.to_header())
+    header = MetaDict(dict(wcs.to_header()))
 
     header.update(get_meta_from_exif(exif_data))
     dsun = sunpy.coordinates.get_sunearth_distance(time.isoformat())
     lat = header.get('LAT')
     lon = header.get('LON')
     solar_rotation_angle = get_solar_rotation_angle(lat, lon, time)
-    header.update({'CROTA2': solar_rotation_angle.to('deg').value})
-    header.update({'DSUN_OBS': dsun.to('m').value})
+    header.update({'crota2': solar_rotation_angle.to('deg').value})
+    header.update({'dsun_obs': dsun.to('m').value})
     hgln_obs = 0 * u.deg
     hglt_obs = sunpy.coordinates.get_sun_B0(time)
-    header.update({'HGLN_OBS': hgln_obs.to('deg').value})
-    header.update({'HGLT_OBS': hglt_obs.to('deg').value})
-    header.update({'CTYPE1': 'HPLN-TAN'})
-    header.update({'CTYPE2': 'HPLT-TAN'})
-    header.update({'RSUN': dsun.to('m').value})
-    header.update({'RSUN_OBS': np.arctan(sunpy.sun.constants.radius / dsun).to(
+    header.update({'hgln_obs': hgln_obs.to('deg').value})
+    header.update({'hglt_obs': hglt_obs.to('deg').value})
+    header.update({'ctype1': 'HPLN-TAN'})
+    header.update({'ctype2': 'HPLT-TAN'})
+    header.update({'rsun': dsun.to('m').value})
+    header.update({'rsun_obs': np.arctan(sunpy.sun.constants.radius / dsun).to(
         'arcsec').value})
     return header
 

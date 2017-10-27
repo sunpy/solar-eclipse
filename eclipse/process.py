@@ -2,9 +2,13 @@ from skimage.transform import hough_circle, hough_circle_peaks
 import scipy.ndimage as ndimage
 import numpy as np
 import astropy.units as u
+from sunpy.map import GenericMap
+import eclipse.meta as m
+import exifread
+import matplotlib
 
 
-def find_center_and_radius(im):
+def find_sun_center_and_radius(im):
     """Given an image of the eclipsed Sun find the center and radius of the
     image."""
 
@@ -34,3 +38,29 @@ def find_center_and_radius(im):
     im_radius = radius * u.pix
 
     return im_cx, im_cy, im_radius
+
+
+class EclipseMap(GenericMap):
+    def __init__(self, filename):
+        # load the image data
+        im_rgb = np.flipud(matplotlib.image.imread(filename))
+        # remove the color information
+        im = np.average(im_rgb, axis=2)
+
+        # find the sun center and radius
+        im_cx, im_cy, im_radius = find_sun_center_and_radius(im)
+
+        tags = exifread.process_file(open(filename, 'rb'))
+        time = m.get_image_time(tags)
+
+        ###############################################################################
+        # With the time and the radius of the solar disk we can calculate the plate
+        # scale.
+        plate_scale = m.get_plate_scale(time, im_radius)
+
+        ###############################################################################
+        # We can now build a WCS object and a meta dictionary. We then append a few
+        # more meta tags to the meta dictionary.
+        wcs = m.build_wcs(im_cx, im_cy, plate_scale)
+        meta = m.build_meta(wcs, tags)
+        GenericMap.__init__(self, data=im, header=meta)
