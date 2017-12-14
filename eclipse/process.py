@@ -11,8 +11,29 @@ __all__ = ['find_sun_center_and_radius', 'eclipse_image_to_map']
 
 
 def find_sun_center_and_radius(im):
-    """Given an image of the eclipsed Sun find the center and radius of the
-    image."""
+    """
+    Given an image of the eclipsed Sun find the center and radius of the
+    image.
+
+    Parameters
+    ----------
+
+    im : `numpy.ndarray`
+        The image.
+
+    Returns
+    -------
+
+    im_cx : `astropy.units.Quantity`
+        The x coordinate of the centre of the disk.
+
+    im_cy : `astropy.units.Quantity`
+        The y coordinate of the centre of the disk.
+
+    im_radius : `astropy.units.Quantity`
+        The radius of the disk.
+
+    """
 
     blur_im = ndimage.gaussian_filter(im, 8)
     mask = blur_im > blur_im.mean() * 3
@@ -43,6 +64,20 @@ def find_sun_center_and_radius(im):
 
 
 def eclipse_image_to_map(filename):
+    """
+    Given the filename to a photo, convert it to a `sunpy.map.GenericMap` object.
+
+    Parameters
+    ----------
+    filename : `str`
+        The filename of the image.
+
+    Returns
+    -------
+    sunpymap : `sunpy.map.GenericMap`
+        A SunPy map with valid metadata for the image.
+
+    """
     # load the image data
     im_rgb = np.flipud(matplotlib.image.imread(filename))
     # remove the color information

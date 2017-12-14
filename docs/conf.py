@@ -71,6 +71,8 @@ exclude_patterns.append('_templates')
 # be used globally.
 rst_epilog += """
 """
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping['http://docs.sunpy.org/en/stable/'] = None
 
 # -- Project information ------------------------------------------------------
 
@@ -193,6 +195,7 @@ try:
                                      'gallery'),  # path to save gallery generated examples
         'default_thumb_file': os.path.join('.', 'logo', 'sunpy_icon_128x128.png'),
         'reference_url': {
+            'eclipse': None,
             'sunpy': 'http://docs.sunpy.org/en/stable',
             'astropy': 'http://docs.astropy.org/en/stable/',
             'matplotlib': 'http://matplotlib.org/',
