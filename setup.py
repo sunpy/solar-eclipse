@@ -30,12 +30,12 @@ conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
 
-PACKAGENAME = metadata.get('package_name', 'packagename')
-DESCRIPTION = metadata.get('description', 'packagename')
-AUTHOR = metadata.get('author', 'Astropy Developers')
+PACKAGENAME = metadata.get('package_name', 'eclipse')
+DESCRIPTION = metadata.get('description', 'Code to process photographs of the American Solar Eclipse 2017')
+AUTHOR = metadata.get('author', 'SunPy Developers')
 AUTHOR_EMAIL = metadata.get('author_email', '')
 LICENSE = metadata.get('license', 'unknown')
-URL = metadata.get('url', 'http://astropy.org')
+URL = metadata.get('url', 'http://sunpy.org')
 
 # order of priority for long_description:
 #   (1) set in setup.cfg,
@@ -121,8 +121,7 @@ package_info['package_data'][PACKAGENAME].extend(c_files)
 # Note that requires and provides should not be included in the call to
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
-print('got here')
-print(scripts)
+
 setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,

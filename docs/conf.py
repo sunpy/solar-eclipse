@@ -112,13 +112,12 @@ release = package.__version__
 # name of a builtin theme or the name of a custom theme in html_theme_path.
 #html_theme = None
 
-# Please update these texts to match the name of your package.
-html_theme_options = {
-    'logotext1': 'solar-eclipse',  # white,  semi-bold
-    'logotext2': '',  # orange, light
-    'logotext3': ':docs'   # white,  light
-    }
 
+try:
+    from sunpy_sphinx_theme.conf import *
+    html_sidebars = {'**': ['docsidebar.html']}
+except ImportError:
+    html_theme = 'default'
 
 
 # Custom sidebar templates, maps document names to template names.
@@ -126,12 +125,12 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'logo/logo.png'
+#html_logo = ''
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'logo/favicon.ico'
+html_favicon = ''
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -179,31 +178,3 @@ if eval(setup_cfg.get('edit_on_github')):
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
 
-try:
-    import sphinx_gallery
-    extensions += ["sphinx_gallery.gen_gallery"]
-
-    sphinx_gallery_conf = {
-        'backreferences_dir':
-        'generated{}modules'.format(os.sep),  # path to store the module using example template
-        'filename_pattern':
-        '^((?!skip_).)*$',  # execute all examples except those that start with "skip_"
-        'examples_dirs': os.path.join('..', 'examples'),  # path to the examples scripts
-        'gallery_dirs': os.path.join('generated',
-                                    'gallery'),  # path to save gallery generated examples
-        'default_thumb_file': os.path.join('.', 'logo', 'sunpy_icon_128x128.png'),
-        'reference_url': {
-            'sunpy': None,
-            'astropy': 'http://docs.astropy.org/en/stable/',
-            'matplotlib': 'http://matplotlib.org/',
-            'numpy': 'http://docs.scipy.org/doc/numpy/',
-        },
-        'abort_on_example_error': True,
-        'plot_gallery': True
-    }
-except ImportError:
-        def setup(app):
-            app.warn('The sphinx_gallery extension is not installed, so the '
-                    'gallery will not be built.  You will probably see '
-                    'additional warnings about undefined references due '
-                    'to this.')
