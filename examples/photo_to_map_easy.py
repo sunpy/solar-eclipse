@@ -10,20 +10,18 @@ SunPy map.
 """
 import matplotlib.pyplot as plt
 
-from eclipse.process import EclipseMap
+from eclipse.process import eclipse_image_to_map
 from eclipse import SAMPLE_PHOTO
 
 ###############################################################################
 # With the image as well as the meta data we can now create the SunPy Map
-m = EclipseMap(SAMPLE_PHOTO)
+m = eclipse_image_to_map(SAMPLE_PHOTO)
 
 ###############################################################################
 # Now plot the map
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(10, 10))
 ax = plt.subplot(projection=m)
 m.plot(axes=ax)
 m.draw_grid(axes=ax)
 m.draw_limb(axes=ax)
 plt.show()
-
-

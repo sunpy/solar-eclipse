@@ -7,6 +7,8 @@ import eclipse.meta as m
 import exifread
 import matplotlib
 
+__all__ = ['find_sun_center_and_radius', 'eclipse_image_to_map']
+
 
 def find_sun_center_and_radius(im):
     """Given an image of the eclipsed Sun find the center and radius of the
@@ -40,27 +42,26 @@ def find_sun_center_and_radius(im):
     return im_cx, im_cy, im_radius
 
 
-class EclipseMap(GenericMap):
-    def __init__(self, filename):
-        # load the image data
-        im_rgb = np.flipud(matplotlib.image.imread(filename))
-        # remove the color information
-        im = np.average(im_rgb, axis=2)
+def eclipse_image_to_map(filename):
+    # load the image data
+    im_rgb = np.flipud(matplotlib.image.imread(filename))
+    # remove the color information
+    im = np.average(im_rgb, axis=2)
 
-        # find the sun center and radius
-        im_cx, im_cy, im_radius = find_sun_center_and_radius(im)
+    # find the sun center and radius
+    im_cx, im_cy, im_radius = find_sun_center_and_radius(im)
 
-        tags = exifread.process_file(open(filename, 'rb'))
-        time = m.get_image_time(tags)
+    tags = exifread.process_file(open(filename, 'rb'))
+    time = m.get_image_time(tags)
 
-        ###############################################################################
-        # With the time and the radius of the solar disk we can calculate the plate
-        # scale.
-        plate_scale = m.get_plate_scale(time, im_radius)
+    ###############################################################################
+    # With the time and the radius of the solar disk we can calculate the plate
+    # scale.
+    plate_scale = m.get_plate_scale(time, im_radius)
 
-        ###############################################################################
-        # We can now build a WCS object and a meta dictionary. We then append a few
-        # more meta tags to the meta dictionary.
-        wcs = m.build_wcs(im_cx, im_cy, plate_scale)
-        meta = m.build_meta(wcs, tags)
-        GenericMap.__init__(self, data=im, header=meta)
+    ###############################################################################
+    # We can now build a WCS object and a meta dictionary. We then append a few
+    # more meta tags to the meta dictionary.
+    wcs = m.build_wcs(im_cx, im_cy, plate_scale)
+    meta = m.build_meta(wcs, tags)
+    return GenericMap(data=im, header=meta)

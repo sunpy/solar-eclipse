@@ -12,21 +12,24 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
-from eclipse.process import EclipseMap
+from eclipse.process import eclipse_image_to_map
 from eclipse import SAMPLE_PHOTO
 
 ###############################################################################
 # Create the eclipse map
-m = EclipseMap(SAMPLE_PHOTO)
+m = eclipse_image_to_map(SAMPLE_PHOTO)
 
 ###############################################################################
 # Using the RA and DEC for Regulus we can create a coordinate object for it.
-regulus = SkyCoord(ra='10h08m22.311s', dec='11d58m01.95s',
-                   distance=79.3 * u.lightyear, frame='icrs').transform_to(m.coordinate_frame)
+regulus = SkyCoord(
+    ra='10h08m22.311s',
+    dec='11d58m01.95s',
+    distance=79.3 * u.lightyear,
+    frame='icrs').transform_to(m.coordinate_frame)
 
 ###############################################################################
 # Now plot the map with Regulus overlaid
-fig = plt.figure(figsize=(9,9))
+fig = plt.figure(figsize=(9, 9))
 ax = plt.subplot(projection=m)
 m.plot(axes=ax)
 ax.plot_coord(regulus, '*w', label='Regulus')
