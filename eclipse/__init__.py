@@ -9,5 +9,5 @@ from ._sunpy_init import *
 if not _ASTROPY_SETUP_:
     import os
     _package_directory = os.path.dirname(os.path.abspath(__file__))
-    _data_directory = os.path.abspath(os.path.join(_package_directory, 'sample-photos'))
+    _data_directory = os.path.abspath(os.path.join(_package_directory, 'sample_photos'))
     SAMPLE_PHOTO = os.path.join(_data_directory, 'total_solar_eclipse2017.jpg')
