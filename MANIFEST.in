@@ -1,41 +1,21 @@
-include README.rst
-include CHANGES.rst
-
-include ez_setup.py
-include ah_bootstrap.py
-include setup.cfg
-include eclipse/tests/coveragerc
-
-recursive-include eclipse *.pyx *.c *.pxd
-recursive-include docs *
-recursive-include licenses *
-recursive-include cextern *
-recursive-include scripts *
-
-prune build
-prune docs/_build
-prune docs/api
-
-
-# the next few stanzas are for astropy_helpers.  It's derived from the
-# astropy_helpers/MANIFEST.in, but requires additional includes for the actual
-# package directory and egg-info.
-
-include astropy_helpers/README.rst
-include astropy_helpers/CHANGES.rst
-include astropy_helpers/LICENSE.rst
-recursive-include astropy_helpers/licenses *
-
-include astropy_helpers/ez_setup.py
-include astropy_helpers/ah_bootstrap.py
-
-recursive-include astropy_helpers/astropy_helpers *.py *.pyx *.c *.h *.rst
-recursive-include astropy_helpers/astropy_helpers.egg-info *
-# include the sphinx stuff with "*" because there are css/html/rst/etc.
-recursive-include astropy_helpers/astropy_helpers/sphinx *
-
-prune astropy_helpers/build
-prune astropy_helpers/astropy_helpers/tests
-
-
-global-exclude *.pyc *.o
+# Exclude specific files
+# All files which are tracked by git and not explicitly excluded here are included by setuptools_scm
+exclude .codecov.yaml
+exclude .mailmap
+exclude .editorconfig
+exclude .gitattributes
+exclude .gitignore
+exclude .pep8speaks.yml
+exclude .pre-commit-config.yaml
+exclude .test_package_pins.txt
+exclude .zenodo.json
+exclude azure-pipelines.yml
+exclude readthedocs.yml
+exclude rtd-environment.yml
+# Prune folders
+prune .circleci
+prune .github
+prune .jupyter
+prune binder
+prune changelog
+prune tools
