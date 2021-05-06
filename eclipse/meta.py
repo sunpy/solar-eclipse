@@ -91,14 +91,14 @@ def get_meta_from_exif(exif_data):
     result.update({'AUTHOR': author_str})
     result.update({'EXPTIME': exposure_time.to('s').value})
     result.update({'TELECOP': camera_model_str})
-    result.update({'LAT': gps[0]})
-    result.update({'LON': gps[1]})
+    result.update({'LAT': gps[0].to_value(u.deg)})
+    result.update({'LON': gps[1].to_value(u.deg)})
     result.update({'DATEOBS': time.isoformat()})
     return result
 
 
 def get_plate_scale(time, im_radius):
-    dsun = sunpy.coordinates.get_sunearth_distance(time.isoformat())
+    dsun = sunpy.coordinates.sun.earth_distance(time.isoformat())
     rsun_obs = np.arctan(sunpy.sun.constants.radius / dsun).to('arcsec')
     plate_scale = rsun_obs / im_radius
     return plate_scale
@@ -121,14 +121,14 @@ def build_meta(wcs, exif_data):
     header = MetaDict(dict(wcs.to_header()))
 
     header.update(get_meta_from_exif(exif_data))
-    dsun = sunpy.coordinates.get_sunearth_distance(time.isoformat())
-    lat = header.get('LAT')
-    lon = header.get('LON')
+    dsun = sunpy.coordinates.sun.earth_distance(time.isoformat())
+    lat = header.get('LAT') * u.deg
+    lon = header.get('LON') * u.deg
     solar_rotation_angle = get_solar_rotation_angle(lat, lon, time)
     header.update({'crota2': solar_rotation_angle.to('deg').value})
     header.update({'dsun_obs': dsun.to('m').value})
     hgln_obs = 0 * u.deg
-    hglt_obs = sunpy.coordinates.get_sun_B0(time)
+    hglt_obs = sunpy.coordinates.sun.B0(time)
     header.update({'hgln_obs': hgln_obs.to('deg').value})
     header.update({'hglt_obs': hglt_obs.to('deg').value})
     header.update({'ctype1': 'HPLN-TAN'})
@@ -142,6 +142,6 @@ def build_meta(wcs, exif_data):
 def get_solar_rotation_angle(lat, lon, time, fudge_angle=0):
     """Get the solar rotation angle"""
     loc = EarthLocation(lat=lat, lon=lon)
-    solar_rotation_angle = sunpy.coordinates.get_sun_orientation(loc, time)
+    solar_rotation_angle = sunpy.coordinates.sun.orientation(loc, time)
     return solar_rotation_angle + fudge_angle
 
