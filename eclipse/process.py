@@ -1,11 +1,12 @@
-from skimage.transform import hough_circle, hough_circle_peaks
-import scipy.ndimage as ndimage
-import numpy as np
 import astropy.units as u
-from sunpy.map import GenericMap
-import eclipse.meta as m
 import exifread
 import matplotlib
+import numpy as np
+import scipy.ndimage as ndimage
+from skimage.transform import hough_circle, hough_circle_peaks
+from sunpy.map import GenericMap
+
+import eclipse.meta as m
 
 __all__ = ['find_sun_center_and_radius', 'eclipse_image_to_map']
 
